@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # cc206_bahanap
 
 A new Flutter project.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# cc206-bahanap
+Final Project
+>>>>>>> e9d729632d62400f0a9353b843f1a606774b95ff
