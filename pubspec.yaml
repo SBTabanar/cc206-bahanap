@@ -52,7 +52,14 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+  - assets/images/
+  fonts:
+    - family: Syne
+      fonts:
+        - asset: assets/fonts/Syne-Regular.ttf
+        - asset: assets/fonts/Syne-Bold.ttf
+          weight: 400
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
