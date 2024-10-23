@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'features/sign_up_page.dart';
+import 'features/sign_in_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SignUpPage(),
+      home: const SignInPage(),
     );
   }
 }
