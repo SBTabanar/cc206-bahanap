@@ -1,3 +1,4 @@
+import 'package:cc206_bahanap/features/tab_view.dart';
 import 'package:flutter/material.dart';
 import 'features/dashboard_page.dart';
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
          primarySwatch: Colors.blue,
       ),
-      home: const DashboardPage(),
+      home: const TabView(),
     );
   }
 }

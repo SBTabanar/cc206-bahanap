@@ -10,7 +10,7 @@ class DashboardPage extends StatelessWidget {
 	    body:  ListView(
       scrollDirection: Axis.vertical,
 	    children: [
-        Padding(
+            Padding(
           padding: const EdgeInsets.fromLTRB(10, 55, 10, 10),
           child: 
             Row(
@@ -269,49 +269,30 @@ class DashboardPage extends StatelessWidget {
           ],
           ),
       ),
-      Container(
-          margin: const EdgeInsets.fromLTRB(10, 17, 10, 10),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Color(0xff32ADE6), borderRadius: BorderRadius.circular(32)),
-          child: Table(
-            children: <TableRow>[
-              TableRow(children: <Widget>[
-                IconButton( 
-                  icon: Icon(Icons.home_outlined, size: 30, color: Colors.white,),
-                  onPressed: () {
-                    
-                  },
-                  ),
-                IconButton( 
-                  icon: Icon(Icons.groups_outlined, size: 30, color: Colors.white,),
-                  onPressed: () {
-                    
-                  },
-                  ),
-                IconButton( 
-                  icon: Icon(Icons.map_outlined, size: 30, color: Colors.white,),
-                  onPressed: () {
-                    
-                  },
-                  ),
-                IconButton( 
-                  icon: Icon(Icons.explore_outlined, size: 30, color: Colors.white,),
-                  onPressed: () {
-                    
-                  },
-                  ),
-                IconButton( 
-                  icon: Icon(Icons.account_circle_outlined, size: 30, color: Colors.white,),
-                  onPressed: () {
-                    
-                  },
-                  ),
-              ])
-            ],
-          ),
-      )
-      ]
-      )
+      
+          ]
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: Padding(padding: EdgeInsets.fromLTRB(20, 20, 0, 20),
+      child: FloatingActionButton(
+        onPressed: () {
+          // Add your SOS button action here
+          showDialog(context: context, 
+                builder: (context) => AlertDialog(
+                  title: Text("SOS Alert"),
+                  content: Text("Your SOS alert has been successfully sent. Stay safe."),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context), 
+                    child: Text("Ok"))
+                  ],
+                ));
+        },
+        backgroundColor: Colors.red,
+        child: Text(
+          'SOS',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),shape: CircleBorder(),
+      ),)
     );
   }
 }
