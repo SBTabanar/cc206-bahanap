@@ -1,5 +1,7 @@
+import 'package:cc206_bahanap/features/tab_view.dart';
 import 'package:flutter/material.dart';
 import 'features/sign_up_page.dart';
+import 'features/dashboard_page.dart';
 
 void main() {
   runApp(MyApp());
