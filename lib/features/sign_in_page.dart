@@ -94,6 +94,7 @@ class SignInPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
+                        Navigator.pushNamed(context, 'dash');
                         if (_formKey.currentState!.validate()) {
                           // logic diri for login
                         }
@@ -122,7 +123,17 @@ class SignInPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // logic for Google sign in
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Text("Login with google"),
+                                  content: const Text("Google Login API here."),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text("Ok"))
+                                  ],
+                                ));
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(50),
@@ -153,7 +164,17 @@ class SignInPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // logic for Apple sign in
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Text("Login with apple"),
+                                  content: const Text("Apple Login API here."),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text("Ok"))
+                                  ],
+                                ));
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(50),

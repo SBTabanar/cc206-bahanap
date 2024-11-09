@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cc206_bahanap/features/notifications_page.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});

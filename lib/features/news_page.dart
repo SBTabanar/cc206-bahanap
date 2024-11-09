@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cc206_bahanap/features/notifications_page.dart';
 
 class NewsPage extends StatelessWidget {
   const NewsPage({super.key});

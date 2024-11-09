@@ -7,7 +7,6 @@ import 'package:cc206_bahanap/features/account_page.dart';
 class TabView extends StatelessWidget {
   const TabView({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const DefaultTabController(
