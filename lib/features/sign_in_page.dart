@@ -1,14 +1,46 @@
+import 'package:cc206_bahanap/features/dashboard_page.dart';
 import 'package:cc206_bahanap/features/sign_up_page.dart';
 import 'package:cc206_bahanap/features/forgot_password.dart';
 import 'package:flutter/material.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+  _SignInPageState createState() => _SignInPageState();
+}
 
+Route _createFadeRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => DashboardPage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+  );
+}
+
+Route _createFadeRoute2() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => SignUpPage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+  );
+}
+
+class _SignInPageState extends State<SignInPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  bool _keepMeLoggedIn = false;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -17,22 +49,46 @@ class SignInPage extends StatelessWidget {
             child: Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50),
-                  Image.asset(
-                    'assets/bahanap.png',
-                    height: 200,
-                    width: 200,
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, 'getstarted');
+                    },
+                    icon: const Icon(Icons.arrow_back,
+                        size: 30, color: Color(0xFF32ade6)),
                   ),
-                  const SizedBox(height: 50),
-                  const SizedBox(height: 16),
+                  const Text(
+                    'Login Account',
+                    style: TextStyle(
+                        fontFamily: 'SfPro',
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0XFF154961)),
+                  ),
+                  const Text(
+                    'Welcome back!',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0XFF575757)),
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'Email Address',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0XFF575757)),
+                  ),
                   TextFormField(
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      labelText: 'Email',
-                    ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        labelText: 'Enter email address',
+                        labelStyle: const TextStyle(
+                            color: Color(0xFFAFAFAF), fontSize: 15)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
@@ -46,14 +102,22 @@ class SignInPage extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 16),
+                  const Text(
+                    'Password',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0XFF575757)),
+                  ),
                   TextFormField(
                     obscureText: true,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      labelText: 'Password',
-                    ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        labelText: 'Enter password',
+                        labelStyle: const TextStyle(
+                            color: Color(0xFFAFAFAF), fontSize: 15)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
@@ -68,24 +132,32 @@ class SignInPage extends StatelessWidget {
                       Row(
                         children: [
                           Checkbox(
-                            value: true,
+                            value: _keepMeLoggedIn,
                             onChanged: (bool? value) {
-                              // logic for remember me checkbox
+                              setState(() {
+                                _keepMeLoggedIn = value ?? false;
+                              });
                             },
+                            activeColor: Colors.blue,
                           ),
-                          const Text('Remember me'),
+                          const Text(
+                            'Keep me logged in',
+                            style: TextStyle(
+                                fontSize: 14, color: Color(0XFF575757)),
+                          ),
                         ],
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ForgotPassword(),
-                            ),
-                          );
+                          Navigator.pushNamed(context, 'forgot');
                         },
-                        child: const Text('Forgot Password?'),
+                        child: const Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Color(0xFF32ade6),
+                            fontSize: 15,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -94,27 +166,38 @@ class SignInPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, 'dash');
-                        if (_formKey.currentState!.validate()) {
-                          // logic diri for login
-                        }
+                        Navigator.of(context).push(_createFadeRoute());
                       },
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
-                        backgroundColor: Colors.lightBlue,
+                        minimumSize: const Size(300, 60),
+                        backgroundColor: const Color(0XFF32ade6),
                         foregroundColor: Colors.white,
                         elevation: 5.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(
+                            color: Color(0XFF32ade6),
+                            width: 2.0,
+                          ),
+                        ),
                       ),
-                      child: const Text('Sign In'),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontFamily: 'SfPro',
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
                   const Row(
                     children: [
                       Expanded(child: Divider()),
-                      SizedBox(width: 16),
-                      Text('or'),
-                      SizedBox(width: 16),
+                      SizedBox(width: 12),
+                      Text('or sign in with'),
+                      SizedBox(width: 12),
                       Expanded(child: Divider()),
                     ],
                   ),
@@ -199,6 +282,48 @@ class SignInPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Text("Login with Facebook"),
+                                  content:
+                                      const Text("Facebook Login API here."),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text("Ok"))
+                                  ],
+                                ));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        backgroundColor: Color(0XFF32ade6),
+                        foregroundColor:
+                            const Color.fromARGB(255, 255, 255, 255),
+                        elevation: 5.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/facebook.png',
+                            height: 44,
+                            width: 44,
+                          ),
+                          const SizedBox(width: 2),
+                          const Text(
+                            'Continue with Facebook',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -206,12 +331,7 @@ class SignInPage extends StatelessWidget {
                       const Text("Don't have an account? "),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpPage(),
-                            ),
-                          );
+                          Navigator.of(context).push(_createFadeRoute2());
                         },
                         child: const Text(
                           'Sign up',

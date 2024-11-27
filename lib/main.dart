@@ -1,13 +1,17 @@
-// import 'package:cc206_bahanap/features/tab_view.dart';
+import 'package:cc206_bahanap/features/map_page.dart';
+import 'package:cc206_bahanap/features/welcome.dart';
 import 'package:flutter/material.dart';
+import 'package:cc206_bahanap/features/get_started.dart';
+import 'package:cc206_bahanap/features/forgot_password.dart';
+import 'package:flutter/services.dart';
 import 'features/sign_up_page.dart';
 import 'features/dashboard_page.dart';
 import 'features/sign_in_page.dart';
-import 'features/forgot_password.dart';
+import 'features/verify.dart';
 import 'features/notifications_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -20,6 +24,21 @@ class MyApp extends StatelessWidget {
       title: 'Bahanap',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: Colors.blue,
+        ),
+        focusColor: Colors.blue,
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        inputDecorationTheme: InputDecorationTheme(
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Colors.blue,
+              width: 2.0,
+            ),
+          ),
+        ),
       ),
       initialRoute: 'home',
       routes: {
@@ -27,8 +46,12 @@ class MyApp extends StatelessWidget {
         'forgot': (context) => ForgotPassword(),
         'signup': (context) => SignUpPage(),
         'notifications': (context) => NotificationsPage(),
+        'map': (context) => MapPage(),
+        'signin': (context) => SignInPage(),
+        'getstarted': (context) => GetStarted(),
+        'verify': (context) => Verify(),
       },
-      home: const SignInPage(),
+      home: const Welcome(),
     );
   }
 }

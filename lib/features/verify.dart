@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
-class ForgotPassword extends StatelessWidget {
-  const ForgotPassword({super.key});
+class Verify extends StatelessWidget {
+  const Verify({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class ForgotPassword extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'Forgot Password?',
+                        'Verification',
                         style: TextStyle(fontSize: 24, color: Colors.blue),
                       ),
                       Image.asset(
@@ -40,47 +41,40 @@ class ForgotPassword extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        'Enter the email address associated with your account',
+                        'Enter the verification code we just sent to your email address',
                         style: TextStyle(
                             fontFamily: 'SfPro',
                             fontSize: 16,
                             color: Color(0XFF000000)),
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Enter email address',
-                          labelStyle: TextStyle(
-                            color: Color(0xFFAFAFAF),
-                            fontSize: 15,
-                          ),
-                          border: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
+                      PinCodeTextField(
+                        appContext: context,
+                        length: 4,
+                        obscureText: false,
+                        keyboardType: TextInputType.number,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(8),
+                          fieldHeight: 50,
+                          fieldWidth: 50,
+                          activeFillColor: Colors.blue[50]!,
+                          activeColor: Colors.blue,
+                          selectedColor: Colors.blue,
+                          selectedFillColor: Colors.blue[50]!,
+                          inactiveFillColor: Colors.grey[200]!,
+                          inactiveColor: Colors.grey,
                         ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          final emailRegex =
-                              RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                          if (!emailRegex.hasMatch(value)) {
-                            return 'Enter a valid email';
-                          }
-                          return null;
+                        onChanged: (value) {},
+                        beforeTextPaste: (text) {
+                          return true;
                         },
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, 'verify');
+                          Navigator.pushNamed(context, 'signin');
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(300, 60),
@@ -92,7 +86,7 @@ class ForgotPassword extends StatelessWidget {
                           ),
                         ),
                         child: const Text(
-                          'Send recovery steps',
+                          'Verify',
                           style: TextStyle(
                               fontSize: 19,
                               fontFamily: 'SfPro',
