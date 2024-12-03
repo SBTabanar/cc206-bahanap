@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ForgotPassword extends StatelessWidget {
   const ForgotPassword({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _emailController = TextEditingController();
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -48,21 +51,17 @@ class ForgotPassword extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
+                        controller: _emailController,
                         decoration: const InputDecoration(
                           labelText: 'Enter email address',
-                          labelStyle: TextStyle(
-                            color: Color(0xFFAFAFAF),
-                            fontSize: 15,
-                          ),
+                          labelStyle:
+                              TextStyle(color: Color(0xFFAFAFAF), fontSize: 15),
                           border: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
-                          ),
+                              borderSide: BorderSide(color: Colors.blue)),
                           focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blue),
-                          ),
+                              borderSide: BorderSide(color: Colors.blue)),
                           enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
+                              borderSide: BorderSide(color: Colors.grey)),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
@@ -79,8 +78,8 @@ class ForgotPassword extends StatelessWidget {
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, 'verify');
+                        onPressed: () async {
+                          await _resetPassword(context, _emailController.text);
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(300, 60),
@@ -88,8 +87,7 @@ class ForgotPassword extends StatelessWidget {
                           foregroundColor: Colors.white,
                           elevation: 5.0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                         child: const Text(
                           'Send recovery steps',
@@ -108,5 +106,17 @@ class ForgotPassword extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _resetPassword(BuildContext context, String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password reset email sent!')));
+      Navigator.pushNamed(context, 'verify');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error sending password reset email')));
+    }
   }
 }

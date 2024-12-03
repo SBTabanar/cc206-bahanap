@@ -1,17 +1,35 @@
-import 'package:cc206_bahanap/features/map_page.dart';
-import 'package:cc206_bahanap/features/welcome.dart';
 import 'package:flutter/material.dart';
-import 'package:cc206_bahanap/features/get_started.dart';
-import 'package:cc206_bahanap/features/forgot_password.dart';
-import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'firebase_options.dart';
+import 'features/edit_profile.dart';
+import 'features/map_page.dart';
+import 'features/profile.dart';
+import 'features/settings.dart';
+import 'features/sos.dart';
+import 'features/welcome.dart';
+import 'features/get_started.dart';
+import 'features/forgot_password.dart';
 import 'features/sign_up_page.dart';
 import 'features/dashboard_page.dart';
 import 'features/sign_in_page.dart';
 import 'features/verify.dart';
 import 'features/notifications_page.dart';
+import 'features/image_provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      name: "dev project", options: DefaultFirebaseOptions.currentPlatform);
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CustomImageProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -42,16 +60,33 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: 'home',
       routes: {
-        'dash': (context) => DashboardPage(),
-        'forgot': (context) => ForgotPassword(),
-        'signup': (context) => SignUpPage(),
-        'notifications': (context) => NotificationsPage(),
-        'map': (context) => MapPage(),
-        'signin': (context) => SignInPage(),
-        'getstarted': (context) => GetStarted(),
-        'verify': (context) => Verify(),
+        'welcome': (context) => const Welcome(),
+        'dash': (context) => const DashboardPage(),
+        'forgot': (context) => const ForgotPassword(),
+        'signup': (context) => const SignUpPage(),
+        'notifications': (context) => const NotificationsPage(),
+        'map': (context) => const MapPage(),
+        'signin': (context) => const SignInPage(),
+        'getstarted': (context) => const GetStarted(),
+        'verify': (context) => const Verify(),
+        'sos': (context) => const SosPage(),
+        'profile': (context) => const ProfilePage(),
+        'settings': (context) => const SettingsPage(),
+        'editprofile': (context) => const EditProfilePage(),
       },
-      home: const Welcome(),
+      home: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (snapshot.data != null) {
+              return const DashboardPage();
+            }
+            return const Welcome();
+          }),
     );
   }
 }

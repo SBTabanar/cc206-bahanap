@@ -41,35 +41,11 @@ class Verify extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        'Enter the verification code we just sent to your email address',
+                        'Please follow the steps we have sent to your email address',
                         style: TextStyle(
                             fontFamily: 'SfPro',
                             fontSize: 16,
                             color: Color(0XFF000000)),
-                      ),
-                      const SizedBox(height: 20),
-                      PinCodeTextField(
-                        appContext: context,
-                        length: 4,
-                        obscureText: false,
-                        keyboardType: TextInputType.number,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        pinTheme: PinTheme(
-                          shape: PinCodeFieldShape.box,
-                          borderRadius: BorderRadius.circular(8),
-                          fieldHeight: 50,
-                          fieldWidth: 50,
-                          activeFillColor: Colors.blue[50]!,
-                          activeColor: Colors.blue,
-                          selectedColor: Colors.blue,
-                          selectedFillColor: Colors.blue[50]!,
-                          inactiveFillColor: Colors.grey[200]!,
-                          inactiveColor: Colors.grey,
-                        ),
-                        onChanged: (value) {},
-                        beforeTextPaste: (text) {
-                          return true;
-                        },
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
@@ -86,7 +62,7 @@ class Verify extends StatelessWidget {
                           ),
                         ),
                         child: const Text(
-                          'Verify',
+                          'Continue',
                           style: TextStyle(
                               fontSize: 19,
                               fontFamily: 'SfPro',

@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'image_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -17,35 +23,56 @@ class _DashboardPageState extends State<DashboardPage> {
   LocationData? _locationData;
   String currentAddress = "Fetching address...";
 
+  Future<void> uploadLocation(double lat, double lon) async {
+    final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (uid.isEmpty) {
+      print("Error: User not logged in.");
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance.collection("profiles").doc(uid).set({
+        "Coordinates": lat.toString() + ', ' + lon.toString(),
+        "Location": currentAddress,
+      }, SetOptions(merge: true));
+
+      print("Location updated successfully");
+    } catch (e) {
+      print("Error updating location: $e");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _fetchLocation();
   }
 
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, 'welcome');
+  }
+
   Future<void> _fetchLocation() async {
-    // Ensure location services are enabled
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) return;
     }
 
-    // Request location permissions
     _permissionGranted = await location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) return;
     }
 
-    // Fetch location data
     _locationData = await location.getLocation();
     if (_locationData != null) {
       double lat = _locationData!.latitude!;
       double lon = _locationData!.longitude!;
 
-      // Convert coordinates to human-readable address
       _fetchAddressFromCoordinates(lat, lon);
+      uploadLocation(lat, lon);
     }
   }
 
@@ -73,6 +100,15 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      Provider.of<CustomImageProvider>(context, listen: false)
+          .setImage(File(image.path));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -84,41 +120,45 @@ class _DashboardPageState extends State<DashboardPage> {
             child: Column(
               children: [
                 Container(
-                  height: 80,
-                  width: MediaQuery.of(context).size.width,
-                  child: Card(
-                      elevation: 5,
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const CircleAvatar(
-                              radius: 23,
-                              backgroundImage:
-                                  AssetImage('assets/images/dgfdfdsdsf2.jpg'),
+                    height: 80,
+                    width: MediaQuery.of(context).size.width,
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: Provider.of<CustomImageProvider>(
+                                              context)
+                                          .imageFile !=
+                                      null
+                                  ? FileImage(
+                                      Provider.of<CustomImageProvider>(context)
+                                          .imageFile!)
+                                  : AssetImage('assets/images/dgfdfdsdsf2.jpg'),
                             ),
-                            const Text('BaHanap',
-                                key: ValueKey('bahanapText'),
-                                style: TextStyle(
-                                  fontSize: 35,
-                                  fontFamily: 'Gilroy',
-                                  color: Color(0XFF32ade6),
-                                  letterSpacing: -3.0,
-                                )),
-                            IconButton.outlined(
-                              padding: EdgeInsets.all(9),
-                              icon: const Icon(
-                                  Icons.notifications_none_outlined,
-                                  color: Colors.black),
-                              onPressed: () {
-                                Navigator.pushNamed(context, 'notifications');
-                              },
-                            ),
-                          ],
-                        ),
-                      )),
-                ),
+                          ),
+                          const Text('BaHanap',
+                              key: ValueKey('bahanapText'),
+                              style: TextStyle(
+                                fontSize: 35,
+                                fontFamily: 'Gilroy',
+                                color: Color(0XFF32ade6),
+                                letterSpacing: -3.0,
+                              )),
+                          IconButton.outlined(
+                            padding: EdgeInsets.all(9),
+                            icon: const Icon(Icons.logout, color: Colors.black),
+                            onPressed: () {
+                              _signOut();
+                            },
+                          ),
+                        ],
+                      ),
+                    )),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -401,20 +441,7 @@ class _DashboardPageState extends State<DashboardPage> {
             width: 90,
             child: FloatingActionButton(
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text("SOS Alert"),
-                    content: const Text(
-                        "Your SOS alert has been successfully sent. Stay safe."),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Ok"),
-                      ),
-                    ],
-                  ),
-                );
+                Navigator.pushNamed(context, 'sos');
               },
               backgroundColor: const Color.fromARGB(255, 239, 66, 63),
               shape: const CircleBorder(),

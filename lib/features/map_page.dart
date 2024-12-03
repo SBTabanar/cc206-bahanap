@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'package:cc206_bahanap/features/image_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -25,7 +29,6 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-
     DeviceOrientation.portraitUp;
     _initializeMarkers();
     _startLocationUpdates();
@@ -37,29 +40,70 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchCurrentLocation();
+  }
+
+  Future<void> _fetchCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      LatLng newLocation = LatLng(position.latitude, position.longitude);
+      setState(() {
+        userLocation = newLocation;
+        _updateUserMarker(newLocation);
+        uploadLocation(newLocation);
+      });
+    } catch (e) {
+      print("Error fetching current location: $e");
+      _showErrorDialog('Unable to fetch current location.');
+    }
+  }
+
   void _initializeMarkers() {
     _markers.addAll([
-      const Marker(
-        width: 80.0,
-        height: 80.0,
-        point: LatLng(14.5995, 120.9842), // Example position (Manila)
-        child: Icon(
-          Icons.location_on,
-          size: 40.0,
-          color: Colors.red,
-        ),
-      ),
-      const Marker(
-        width: 80.0,
-        height: 80.0,
-        point: LatLng(10.3157, 123.8854), // Example position (Cebu)
-        child: Icon(
-          Icons.place,
-          size: 40.0,
-          color: Colors.blue,
+      Marker(
+        width: 40.0,
+        height: 40.0,
+        point: LatLng(
+            10.731313595934806, 122.5468959579256), // Example position (CPU)
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.blue,
+              width: 3.0,
+            ),
+          ),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundImage: AssetImage('assets/images/sergei.png'),
+          ),
         ),
       ),
     ]);
+  }
+
+  Future<void> uploadLocation(LatLng loc) async {
+    final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (uid.isEmpty) {
+      print("Error: User not logged in.");
+      return;
+    }
+
+    try {
+      String formattedLocation = "Lat: ${loc.latitude}, Lon: ${loc.longitude}";
+
+      await FirebaseFirestore.instance.collection("profiles").doc(uid).set({
+        "LiveCoordinates": formattedLocation,
+      }, SetOptions(merge: true));
+
+      print("Location updated successfully");
+    } catch (e) {
+      print("Error updating location: $e");
+    }
   }
 
   Future<void> _searchLocation() async {
@@ -93,13 +137,14 @@ class _MapPageState extends State<MapPage> {
     _positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 2, // Update every 10 meters
+        distanceFilter: 2,
       ),
     ).listen((Position position) {
       LatLng newLocation = LatLng(position.latitude, position.longitude);
       setState(() {
         userLocation = newLocation;
         _updateUserMarker(newLocation);
+        uploadLocation(newLocation);
       });
     });
   }
@@ -108,16 +153,32 @@ class _MapPageState extends State<MapPage> {
     if (_userMarker != null) {
       _markers.remove(_userMarker);
     }
+
+    final imageProvider =
+        Provider.of<CustomImageProvider>(context, listen: false);
+    final imageFile = imageProvider.imageFile;
+
     _userMarker = Marker(
-      width: 80.0,
-      height: 80.0,
+      width: 40.0,
+      height: 40.0,
       point: location,
-      child: const Icon(
-        Icons.my_location,
-        size: 40.0,
-        color: Colors.cyan,
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.blue,
+            width: 3.0,
+          ),
+        ),
+        child: CircleAvatar(
+          radius: 20,
+          backgroundImage: imageFile != null
+              ? FileImage(imageFile)
+              : const AssetImage('assets/images/dgfdfdsdsf2.jpg'),
+        ),
       ),
     );
+
     _markers.add(_userMarker!);
   }
 
@@ -176,7 +237,7 @@ class _MapPageState extends State<MapPage> {
             FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                initialCenter: userLocation ?? LatLng(14.5995, 120.9842),
+                initialCenter: userLocation ?? LatLng(10.7202, 122.5621),
                 initialZoom: 13.0,
               ),
               children: [
@@ -240,16 +301,79 @@ class _MapPageState extends State<MapPage> {
                 child: Container(
                   height: 35,
                   width: 35,
-                  decoration: const BoxDecoration(
-                    color: Color(0xff32ade6),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 255, 255, 255),
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.black,
+                      width: 0.5,
+                    ),
                   ),
                   child: const Icon(
-                    Icons.location_searching,
+                    Icons.location_on_outlined,
                     size: 25.0,
-                    color: Color.fromARGB(255, 255, 255, 255),
+                    color: Color(0xff32ade6),
                   ),
                 ),
+              ),
+            ),
+            Positioned(
+              top: 140,
+              right: 16,
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _mapController.move(
+                        _mapController.camera.center,
+                        _mapController.camera.zoom + 1,
+                      );
+                    },
+                    child: Container(
+                      height: 35,
+                      width: 35,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.zoom_in,
+                        size: 30,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: () {
+                      _mapController.move(
+                        _mapController.camera.center,
+                        _mapController.camera.zoom - 1,
+                      );
+                    },
+                    child: Container(
+                      height: 35,
+                      width: 35,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.zoom_out,
+                        size: 30,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -261,20 +385,7 @@ class _MapPageState extends State<MapPage> {
           width: 90,
           child: FloatingActionButton(
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text("SOS Alert"),
-                  content: const Text(
-                      "Your SOS alert has been successfully sent. Stay safe."),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Ok"),
-                    ),
-                  ],
-                ),
-              );
+              Navigator.pushNamed(context, 'sos');
             },
             backgroundColor: const Color.fromARGB(255, 239, 66, 63),
             shape: const CircleBorder(),

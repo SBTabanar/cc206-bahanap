@@ -8,7 +8,7 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class NotificationsPageState extends State<NotificationsPage> {
-  final List<String> items = List.generate(10, (index) => "Item $index");
+  final List<String> items = List.generate(3, (index) => "Item $index");
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class NotificationsPageState extends State<NotificationsPage> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'BaHanap',
@@ -34,13 +34,13 @@ class NotificationsPageState extends State<NotificationsPage> {
                         letterSpacing: -3.0,
                       ),
                     ),
-                    IconButton(
-                      padding: const EdgeInsets.all(9),
-                      icon: const Icon(Icons.notifications_none_outlined,
-                          color: Colors.black),
-                      iconSize: 35,
-                      onPressed: () {},
-                    ),
+                    // IconButton(
+                    //   padding: const EdgeInsets.all(9),
+                    //   icon: const Icon(Icons.notifications_none_outlined,
+                    //       color: Colors.black),
+                    //   iconSize: 35,
+                    //   onPressed: () {},
+                    // ),
                   ],
                 ),
               ),
@@ -58,28 +58,27 @@ class NotificationsPageState extends State<NotificationsPage> {
                         letterSpacing: -1.0,
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 7),
-                      child: Text(
-                        'See All',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          fontFamily: 'SfPro',
-                          color: Color(0xffafafaf),
-                        ),
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: EdgeInsets.only(top: 7),
+                    //   child: Text(
+                    //     'See All',
+                    //     style: TextStyle(
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 18,
+                    //       fontFamily: 'SfPro',
+                    //       color: Color(0xffafafaf),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
-              // Horizontal ListView.builder
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: SizedBox(
-                    height: 240, // Specify the height for horizontal scrolling
+                    height: 240,
                     child: ListView.builder(
-                      scrollDirection: Axis.horizontal, // Horizontal scrolling
+                      scrollDirection: Axis.horizontal,
                       itemCount: items.length,
                       itemBuilder: (context, index) {
                         final item = items[index];
@@ -155,9 +154,9 @@ class NotificationsPageState extends State<NotificationsPage> {
                 padding: const EdgeInsets.all(10),
                 child: SizedBox(
                     height: 300,
-                    width: 800, // Specify the height for horizontal scrolling
+                    width: 800,
                     child: ListView.builder(
-                      scrollDirection: Axis.horizontal, // Horizontal scrolling
+                      scrollDirection: Axis.horizontal,
                       itemCount: items.length,
                       itemBuilder: (context, index) {
                         final item = items[index];
@@ -187,7 +186,7 @@ class NotificationsPageState extends State<NotificationsPage> {
                                         ),
                                       ),
                                       const Text(
-                                        'Pepito rapidly intensifies into typhoon',
+                                        'Ofel weakens into severe tropical storm...',
                                         style: TextStyle(
                                           fontFamily: 'SfPro',
                                           fontSize: 16,
@@ -195,7 +194,7 @@ class NotificationsPageState extends State<NotificationsPage> {
                                         ),
                                       ),
                                       const Text(
-                                        'Typhoon Pepito (Man-yi) will continue to undergo rapid intensification until Saturday, November 16...',
+                                        'At its peak, Ofel was a super typhoon with maximum sust...',
                                         style: TextStyle(
                                           fontSize: 12,
                                           color:
@@ -224,20 +223,7 @@ class NotificationsPageState extends State<NotificationsPage> {
             width: 90,
             child: FloatingActionButton(
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text("SOS Alert"),
-                    content: const Text(
-                        "Your SOS alert has been successfully sent. Stay safe."),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Ok"),
-                      ),
-                    ],
-                  ),
-                );
+                Navigator.pushNamed(context, 'sos');
               },
               backgroundColor: const Color.fromARGB(255, 239, 66, 63),
               shape: const CircleBorder(),
@@ -292,7 +278,10 @@ class NotificationsPageState extends State<NotificationsPage> {
                       iconSize: 30,
                       color: Colors.white,
                       onPressed: () {
-                        Navigator.pushNamed(context, 'notifications');
+                        if (ModalRoute.of(context)?.settings.name !=
+                            'notifications') {
+                          Navigator.pushNamed(context, 'notifications');
+                        }
                       },
                     ),
                     IconButton(
