@@ -150,7 +150,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           color: Color(0XFF575757)),
                     ),
                     TextFormField(
-                      maxLength: 25,
+                      maxLength: 45,
                       controller: _emailController,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(

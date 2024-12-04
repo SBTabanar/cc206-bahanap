@@ -16,6 +16,7 @@ class _GetStartedState extends State<GetStarted> {
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
+            child: SingleChildScrollView(
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 2),
@@ -182,6 +183,7 @@ class _GetStartedState extends State<GetStarted> {
                                   ),
                                 ),
                               ),
+                              SizedBox(height: 75)
                             ],
                           ),
                   ),
@@ -189,7 +191,7 @@ class _GetStartedState extends State<GetStarted> {
               ),
             ),
           ),
-        ),
+        )),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),

@@ -25,11 +25,14 @@ class _MapPageState extends State<MapPage> {
   Marker? _userMarker;
   final List<Marker> _markers = [];
   StreamSubscription<Position>? _positionStreamSubscription;
+  String userName = " ";
 
   @override
   void initState() {
     super.initState();
     DeviceOrientation.portraitUp;
+
+    _fetchUserName();
     _initializeMarkers();
     _startLocationUpdates();
   }
@@ -44,6 +47,26 @@ class _MapPageState extends State<MapPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _fetchCurrentLocation();
+  }
+
+  Future<void> _fetchUserName() async {
+    final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (uid.isNotEmpty) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection("profiles")
+            .doc(uid)
+            .get();
+        if (userDoc.exists) {
+          setState(() {
+            String fullName = userDoc['Name'] ?? "You ";
+            userName = fullName.split(' ').first;
+          });
+        }
+      } catch (e) {
+        print("Error fetching user name: $e");
+      }
+    }
   }
 
   Future<void> _fetchCurrentLocation() async {
@@ -62,28 +85,72 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  void _initializeMarkers() {
-    _markers.addAll([
-      Marker(
-        width: 40.0,
-        height: 40.0,
-        point: LatLng(
-            10.731313595934806, 122.5468959579256), // Example position (CPU)
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.blue,
-              width: 3.0,
+  void _initializeMarkers() async {
+    _markers.clear();
+
+    final String currentUserUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('profiles').get();
+
+      for (var doc in querySnapshot.docs) {
+        String coordinates = doc['Coordinates'] ?? "0.0, 0.0";
+        String fullName = doc['Name'] ?? "User";
+        String uid = doc.id;
+
+        if (uid == currentUserUid) {
+          continue;
+        }
+
+        String imagePath = 'assets/images/dgfdfdsdsf2.jpg';
+
+        List<String> latLng = coordinates.split(',');
+        double latitude = double.tryParse(latLng[0].trim()) ?? 0.0;
+        double longitude = double.tryParse(latLng[1].trim()) ?? 0.0;
+
+        String userName = fullName.split(' ').first;
+
+        _markers.add(
+          Marker(
+            width: 100.0,
+            height: 100.0,
+            point: LatLng(latitude, longitude),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.green,
+                      width: 3.0,
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundImage: AssetImage(imagePath),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.0,
+                    fontFamily: 'SfPro',
+                  ),
+                ),
+              ],
             ),
           ),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage: AssetImage('assets/images/sergei.png'),
-          ),
-        ),
-      ),
-    ]);
+        );
+      }
+
+      setState(() {});
+    } catch (e) {
+      print("Error initializing markers: $e");
+    }
   }
 
   Future<void> uploadLocation(LatLng loc) async {
@@ -98,6 +165,7 @@ class _MapPageState extends State<MapPage> {
 
       await FirebaseFirestore.instance.collection("profiles").doc(uid).set({
         "LiveCoordinates": formattedLocation,
+        "timestamp": FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
       print("Location updated successfully");
@@ -137,7 +205,7 @@ class _MapPageState extends State<MapPage> {
     _positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 2,
+        distanceFilter: 1,
       ),
     ).listen((Position position) {
       LatLng newLocation = LatLng(position.latitude, position.longitude);
@@ -159,25 +227,34 @@ class _MapPageState extends State<MapPage> {
     final imageFile = imageProvider.imageFile;
 
     _userMarker = Marker(
-      width: 40.0,
-      height: 40.0,
-      point: location,
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.blue,
-            width: 3.0,
-          ),
-        ),
-        child: CircleAvatar(
-          radius: 20,
-          backgroundImage: imageFile != null
-              ? FileImage(imageFile)
-              : const AssetImage('assets/images/dgfdfdsdsf2.jpg'),
-        ),
-      ),
-    );
+        width: 100.0,
+        height: 100.0,
+        point: location,
+        child: Column(
+          children: [
+            Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.blue,
+                    width: 3.0,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 15,
+                  backgroundImage: imageFile != null
+                      ? FileImage(imageFile)
+                      : const AssetImage('assets/images/dgfdfdsdsf2.jpg'),
+                )),
+            Text(
+              userName,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12.0,
+                  fontFamily: 'SfPro'),
+            ),
+          ],
+        ));
 
     _markers.add(_userMarker!);
   }

@@ -223,7 +223,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         children: [
                                           Icon(Icons.email_outlined),
                                           SizedBox(width: 40),
-                                          const Text('Email',
+                                          const Text('Alt Email',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14,

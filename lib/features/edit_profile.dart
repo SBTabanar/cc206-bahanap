@@ -159,7 +159,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: TextFormField(
-                  maxLength: 25,
+                  maxLength: 45,
                   controller: _emailController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -173,7 +173,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       borderRadius: BorderRadius.circular(15),
                       borderSide: const BorderSide(color: Colors.blue),
                     ),
-                    labelText: 'Email',
+                    labelText: 'Alt Email',
                     labelStyle: const TextStyle(
                       color: Color(0xFFAFAFAF),
                       fontSize: 15,
@@ -181,7 +181,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return 'Please enter your contact email';
                     }
                     final emailRegex =
                         RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
