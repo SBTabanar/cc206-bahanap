@@ -22,6 +22,14 @@ class _DashboardPageState extends State<DashboardPage> {
   PermissionStatus _permissionGranted = PermissionStatus.denied;
   LocationData? _locationData;
   String currentAddress = "Fetching address...";
+  final TextEditingController _textController = TextEditingController();
+  String _responseMessage = '';
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
 
   Future<void> uploadLocation(double lat, double lon) async {
     final String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
@@ -106,6 +114,32 @@ class _DashboardPageState extends State<DashboardPage> {
     if (image != null) {
       Provider.of<CustomImageProvider>(context, listen: false)
           .setImage(File(image.path));
+    }
+  }
+
+  Future<void> _sendPostRequest() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.4.1/message'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'message': _textController.text,
+        }),
+      );
+
+      setState(() {
+        if (response.statusCode == 200) {
+          _responseMessage = 'Message sent successfully!';
+        } else {
+          _responseMessage = 'Failed to send message. Status: ${response.statusCode}';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _responseMessage = 'Error: $e';
+      });
     }
   }
 
@@ -423,6 +457,95 @@ class _DashboardPageState extends State<DashboardPage> {
                                               child: Text("Ok"))
                                         ],
                                       ));
+                            },
+                          )),
+                      Padding(
+                          padding: EdgeInsets.all(8),
+                          child: GestureDetector(
+                            child: Card(
+                                color: Color(0xffa1d9f4),
+                                elevation: 10,
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 6),
+                                      const Text(
+                                        'Test',
+                                        style: TextStyle(
+                                            letterSpacing: 0.5,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'SfPro',
+                                            shadows: [
+                                              Shadow(
+                                                offset: Offset(2.0, 3.0),
+                                                blurRadius: 6.0,
+                                                color: Colors.black54,
+                                              ),
+                                            ],
+                                            color: Color.fromARGB(
+                                                255, 255, 255, 255)),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          children: [
+                                            TextField(
+                                              controller: _textController,
+                                              decoration: InputDecoration(
+                                                hintText: 'Message',
+                                                hintStyle: TextStyle(fontSize: 12),
+                                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                filled: true,
+                                                fillColor: Colors.white,
+                                              ),
+                                              style: TextStyle(fontSize: 12),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            ElevatedButton(
+                                              onPressed: _sendPostRequest,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(0xff32ade6),
+                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                minimumSize: Size(double.infinity, 30),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                'Send',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontFamily: 'SfPro',
+                                                ),
+                                              ),
+                                            ),
+                                            if (_responseMessage.isNotEmpty)
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 5),
+                                                child: Text(
+                                                  _responseMessage,
+                                                  style: TextStyle(
+                                                    color: _responseMessage.contains('successfully') 
+                                                        ? Colors.green 
+                                                        : Colors.red,
+                                                    fontSize: 10,
+                                                    fontFamily: 'SfPro',
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ])),
+                            onTap: () {
+                              // Removed the dialog since we now have the input fields directly in the card
                             },
                           )),
                     ],
