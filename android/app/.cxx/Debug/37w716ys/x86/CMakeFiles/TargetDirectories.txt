@@ -1,0 +1,2 @@
+/Users/paulosaballa/development/Bahanap/android/app/.cxx/Debug/37w716ys/x86/CMakeFiles/edit_cache.dir
+/Users/paulosaballa/development/Bahanap/android/app/.cxx/Debug/37w716ys/x86/CMakeFiles/rebuild_cache.dir
